@@ -1,0 +1,146 @@
+@import url('https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600&display=swap');
+
+body {
+    font-family: 'Urbanist', sans-serif;
+}
+
+.category-section {
+    padding: 4rem 1rem;
+    background-color: #ffffff;
+}
+
+.category-title {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.category-card {
+    border: none;
+    border-radius: 1rem;
+    background: #f8f9fa;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.category-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+}
+
+.category-card img {
+    width: 65%;
+    height: 100px;
+    object-fit: contain;
+    margin-bottom: 0.75rem;
+    transition: transform 0.3s ease;
+}
+
+.category-card:hover img {
+    transform: scale(1.07);
+}
+
+.category-card p {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 500;
+    color: #333;
+}
+
+.carousel-item {
+    position: relative;
+}
+
+.gradient-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0));
+    z-index: 1;
+}
+
+.latest-products-section {
+    background-color: #f8f9fa;
+    padding: 4rem 2rem;
+}
+
+.latest-products-title {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    text-align: center;
+    margin-bottom: 3rem;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.product-card {
+    background-color: #fff;
+    border: none;
+    border-radius: 1rem;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.product-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+}
+
+.product-card img {
+    width: 70%;
+    height: 140px;
+    object-fit: contain;
+    margin-bottom: 1rem;
+    transition: transform 0.3s ease;
+}
+
+.product-card:hover img {
+    transform: scale(1.05);
+}
+
+.product-title {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #333;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+.carousel-caption {
+    font-family: 'Urbanist', sans-serif;
+    color: #f1f1f1;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
+    font-weight: 500;
+    font-size: 1.3rem;
+    bottom: 8%;
+    z-index: 10;
+}
+
+.carousel-caption h5 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.carousel-caption p {
+    font-size: 1.1rem;
+    font-weight: 400;
+    margin-bottom: 0;
+}
+
+@media (max-width: 768px) {
+    .carousel-caption {
+        font-size: 1rem;
+        bottom: 10%;
+    }
+
+    .carousel-caption h5 {
+        font-size: 1.5rem;
+    }
+
+    .carousel-caption p {
+        font-size: 0.95rem;
+    }
+}
+
