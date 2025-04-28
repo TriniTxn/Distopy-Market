@@ -11,16 +11,44 @@
             <div class="row">
                 <div class="col-md-4">
                     <div class="card card-sh">
-                        <div class="card-header text-center fs-4">Add Category</div>
+                        <div class="card-header text-center fs-4">
+                            <p class="fs-4">Add Category</p>
+                            <th:block th:if="${session.successMsg}">
+                                <p class="text-success fw-bold">[[${session.successMsg}]]</p>
+                                <th:block th:text="${@commomServiceImpl.removeSessionMessage()}"></th:block>
+                            </th:block>
+
+                            <th:block th:if="${session.errorMsg}">
+                                <p class="text-danger fw-bold">[[${session.errorMsg}]]</p>
+                                <th:block th:text="${@commomServiceImpl.removeSessionMessage()}"></th:block>
+                            </th:block>
+                        </div>
                         <div class="card-body">
-                            <form>
+                            <form action="/admin/saveCategory" method="POST" enctype="multipart/form-data">
                                 <div class="mb-3">
-                                    <label>Enter Category</label> <input type="text" class="form-control">
+                                    <label>Enter Category</label> <input type="text" name="name" class="form-control">
                                 </div>
 
                                 <div class="mb-3">
-                                    <label>Upload Image</label> <input type="file" class="form-control">
+                                    <label>Status</label>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="isActive" value="true" id="radioDefault1">
+                                        <label class="form-check-label" for="radioDefault1">
+                                            Active
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="isActive" value="false" id="radioDefault2" checked>
+                                        <label class="form-check-label" for="radioDefault2">
+                                            Inactive
+                                        </label>
+                                    </div>
                                 </div>
+
+                                <div class="mb-3">
+                                    <label>Upload Image</label> <input type="file" name="file" class="form-control">
+                                </div>
+                                <button type="submit" class="btn btn-primary col-md-12">Submit</button>
                             </form>
                         </div>
                     </div>
