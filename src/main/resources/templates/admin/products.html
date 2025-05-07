@@ -45,7 +45,7 @@
                                         <td>[[${p.price}]]</td>
                                         <td>[[${p.stock}]]</td>
                                         <td>
-                                            <a href="#" class="btn btn-primary btn-sm"> <i class="fa-solid fa-pen-to-square fa-1x"></i> Edit</a>
+                                            <a th:href="@{'/admin/editProduct/'+${p.id}}" class="btn btn-primary btn-sm"> <i class="fa-solid fa-pen-to-square fa-1x"></i> Edit</a>
                                             <a th:href="@{'/admin/deleteProduct/'+${p.id}}" class="btn btn-danger btn-sm"> <i class="fa-solid fa-trash fa-1x"></i> Delete</a>
                                         </td>
                                     </tr>
