@@ -7,8 +7,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.beans.PropertyEditorSupport;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -16,12 +19,28 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
+import java.util.Locale;
 
 @Service
 public class ProductServiceImpl implements ProductService {
 
     @Autowired
     private ProductRepository productRepository;
+
+    @InitBinder
+    public void initBinder(WebDataBinder binder) {
+        binder.registerCustomEditor(Double.class, new PropertyEditorSupport() {
+            @Override
+            public void setAsText(String text) throws IllegalArgumentException {
+                if (text != null && !text.isEmpty()) {
+                    setValue(Double.parseDouble(text.replace(",", ".")));
+                } else {
+                    setValue(null);
+                }
+            }
+        });
+    }
+
 
     @Override
     public Product saveProduct(Product product) {
@@ -52,6 +71,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Product updateProduct(Product product, MultipartFile image) {
+
         Product dbProduct = getProductById(product.getId());
 
         String imageName = image.isEmpty() ? dbProduct.getImage() : image.getOriginalFilename();
@@ -62,6 +82,16 @@ public class ProductServiceImpl implements ProductService {
         dbProduct.setPrice(product.getPrice());
         dbProduct.setStock(product.getStock());
         dbProduct.setImage(imageName);
+        dbProduct.setDiscount(product.getDiscount());
+
+        Double discount = product.getPrice() * (product.getDiscount() / 100.0);
+        Double discountPrice = product.getPrice() - discount;
+
+        dbProduct.setDiscountPrice(discountPrice);
+        System.out.println("Preço: " + product.getPrice());
+        System.out.println("Desconto: " + product.getDiscount());
+        System.out.println("Preço com desconto: " + discountPrice);
+
 
         Product updatedProduct = productRepository.save(dbProduct);
 

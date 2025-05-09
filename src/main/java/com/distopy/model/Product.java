@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
@@ -30,4 +32,8 @@ public class Product {
     private int stock;
 
     private String image;
+
+    private Integer discount;
+
+    private Double discountPrice;
 }
