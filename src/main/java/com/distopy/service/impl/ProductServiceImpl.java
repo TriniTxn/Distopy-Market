@@ -91,7 +91,7 @@ public class ProductServiceImpl implements ProductService {
         System.out.println("Preço: " + product.getPrice());
         System.out.println("Desconto: " + product.getDiscount());
         System.out.println("Preço com desconto: " + discountPrice);
-
+        dbProduct.setIsActive(product.getIsActive());
 
         Product updatedProduct = productRepository.save(dbProduct);
 
@@ -111,6 +111,11 @@ public class ProductServiceImpl implements ProductService {
             return updatedProduct;
         }
         return null;
+    }
+
+    @Override
+    public List<Product> getAllActiveProducts() {
+        return productRepository.findByIsActiveTrue();
     }
 
 
