@@ -26,10 +26,10 @@
                     <div class="card shadow-sm p-2 mb-5 bg-body-tertiary rounded">
                         <div class="card_body">
                             <div class="list-group">
-                                <a href="#" class="list-group-item list-group-item-action active" aria-current="true">
+                                <a href="/products" class="list-group-item list-group-item-action active" aria-current="true">
                                     Categories
                                 </a>
-                                <a href="#" th:each="c:${categories}" class="list-group-item list-group-item-action">[[${c.name}]]</a>
+                                <a th:href="@{'/products?category=' + ${c.name}}" th:each="c:${categories}" class="list-group-item list-group-item-action">[[${c.name}]]</a>
                             </div>
                         </div>
                     </div>
