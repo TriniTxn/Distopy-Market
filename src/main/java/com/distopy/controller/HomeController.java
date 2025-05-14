@@ -2,7 +2,7 @@ package com.distopy.controller;
 
 import com.distopy.model.Category;
 import com.distopy.model.Product;
-import com.distopy.model.UserDetails;
+import com.distopy.model.UserDtls;
 import com.distopy.service.CategoryService;
 import com.distopy.service.ProductService;
 import com.distopy.service.UserService;
@@ -21,6 +21,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.security.Principal;
 import java.util.List;
 
 @Controller
@@ -35,12 +36,25 @@ public class HomeController {
     @Autowired
     private UserService userService;
 
+    @ModelAttribute
+    public void getUserDetails(Principal p, Model m) {
+
+        if (p != null) {
+            String email = p.getName();
+            UserDtls userDtls = userService.getUserByEmail(email);
+            m.addAttribute("user", userDtls);
+        }
+
+        List<Category> allActiveCategory = categoryService.getAllActiveCategory();
+        m.addAttribute("categories", allActiveCategory);
+    }
+
     @GetMapping("/")
     public String index() {
         return "index";
     }
 
-    @GetMapping("/login")
+    @GetMapping("/signin")
     public String login() {
         return "login";
     }
@@ -68,7 +82,7 @@ public class HomeController {
     }
 
     @PostMapping("/saveUser")
-    public String saveUser(@ModelAttribute UserDetails user,
+    public String saveUser(@ModelAttribute UserDtls user,
                            @RequestParam("img") MultipartFile image,
                            HttpSession session) {
 
@@ -78,7 +92,7 @@ public class HomeController {
             user.setProfileImage(imageName);
 
             // Salva usuário no banco
-            UserDetails savedUser = userService.saveUser(user);
+            UserDtls savedUser = userService.saveUser(user);
 
             if (!ObjectUtils.isEmpty(savedUser)) {
                 // Se tiver imagem, salva no sistema de arquivos
@@ -110,5 +124,4 @@ public class HomeController {
 
         return "redirect:/register";
     }
-
 }

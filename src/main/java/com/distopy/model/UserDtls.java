@@ -14,7 +14,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class UserDetails {
+public class UserDtls {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,4 +37,6 @@ public class UserDetails {
     private String password;
 
     private String profileImage;
+
+    private String role;
 }

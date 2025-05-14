@@ -1,8 +1,10 @@
 package com.distopy.service;
 
-import com.distopy.model.UserDetails;
+import com.distopy.model.UserDtls;
 
 public interface UserService {
 
-    public UserDetails saveUser(UserDetails user);
+    public UserDtls saveUser(UserDtls user);
+
+    public UserDtls getUserByEmail(String email);
 }
