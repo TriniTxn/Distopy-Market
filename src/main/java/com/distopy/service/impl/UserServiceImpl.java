@@ -3,11 +3,13 @@ package com.distopy.service.impl;
 import com.distopy.model.UserDtls;
 import com.distopy.repository.UserRepository;
 import com.distopy.service.UserService;
+import com.distopy.util.AppConstant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,6 +26,8 @@ public class UserServiceImpl implements UserService {
     public UserDtls saveUser(UserDtls user) {
         user.setRole("ROLE_USER");
         user.setIsEnabled(true);
+        user.setAccountNonLocked(true);
+        user.setFailedLoginCount(0);
         String encodedPassword = passwordEncoder.encode(user.getPassword());
         user.setPassword(encodedPassword);
         UserDtls saveUser = userRepository.save(user);
@@ -52,5 +56,48 @@ public class UserServiceImpl implements UserService {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public void increaseFailedLoginAttempts(UserDtls user) {
+        int attempt = user.getFailedLoginCount() + 1;
+        user.setFailedLoginCount(attempt);
+        userRepository.save(user);
+    }
+
+    @Override
+    public void userAccountLock(UserDtls user) {
+        user.setAccountNonLocked(false);
+        user.setLockTime(new Date());
+        userRepository.save(user);
+    }
+
+    @Override
+    public Boolean unlockAccountTimeExpired(UserDtls user) {
+
+        long lockTime = user.getLockTime().getTime();
+        long unlockTime = lockTime + AppConstant.UNLOCK_DURATION_TIME;
+
+        long currentTime = System.currentTimeMillis();
+
+        if (unlockTime < currentTime) {
+            user.setAccountNonLocked(true);
+            user.setFailedLoginCount(0);
+            user.setLockTime(null);
+            userRepository.save(user);
+
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public void resetAttempt(int userId) {
+        Optional<UserDtls> findByUser = userRepository.findById(userId);
+        if (findByUser.isPresent()) {
+            UserDtls user = findByUser.get();
+            user.setFailedLoginCount(0);
+            userRepository.save(user);
+        }
     }
 }
