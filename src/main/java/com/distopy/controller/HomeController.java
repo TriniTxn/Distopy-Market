@@ -12,6 +12,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.ObjectUtils;
@@ -43,6 +44,9 @@ public class HomeController {
 
     @Autowired
     private CommomUtils commomUtils;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @ModelAttribute
     public void getUserDetails(Principal p, Model m) {
@@ -171,7 +175,33 @@ public class HomeController {
     }
 
     @GetMapping("/reset_password")
-    public String showResetPassword() {
+    public String showResetPassword(@RequestParam String token, Model m, HttpSession session) {
+
+        UserDtls userByToken = userService.getUserByResetToken(token);
+
+        if (userByToken == null) {
+            m.addAttribute("msg", "Your link is invalid or expired! Please try again!");
+            return "message";
+        }
+        m.addAttribute("token", token);
         return "reset_password.html";
+    }
+
+    @PostMapping("/reset_password")
+    public String resetPassword(@RequestParam String token, Model m,@RequestParam String password, HttpSession session) {
+
+        UserDtls userByToken = userService.getUserByResetToken(token);
+
+        if (userByToken == null) {
+            m.addAttribute("errorMsg", "Your link is invalid or expired! Please try again!");
+            return "message";
+        } else {
+            userByToken.setPassword(passwordEncoder.encode(password));
+            userByToken.setResetToken(null);
+            userService.updateUser(userByToken);
+            session.setAttribute("successMsg", "Password was successfully reset!");
+            m.addAttribute("msg", "Password was successfully reset!");
+            return "redirect:/signin";
+        }
     }
 }

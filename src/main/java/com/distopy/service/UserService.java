@@ -23,4 +23,8 @@ public interface UserService {
     void resetAttempt(int userId);
 
     void updateUserResetToken(String email, String resetToken);
+
+    UserDtls getUserByResetToken(String resetToken);
+
+    UserDtls updateUser(UserDtls user);
 }

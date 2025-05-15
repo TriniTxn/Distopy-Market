@@ -7,7 +7,9 @@ import java.util.List;
 
 public interface UserRepository extends JpaRepository<UserDtls, Integer> {
 
-    public UserDtls findByEmail(String email);
+    UserDtls findByEmail(String email);
 
     List<UserDtls> findByRole(String role);
+
+    UserDtls findByResetToken(String resetToken);
 }
