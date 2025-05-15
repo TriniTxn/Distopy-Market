@@ -6,6 +6,9 @@ import com.distopy.model.UserDtls;
 import com.distopy.service.CategoryService;
 import com.distopy.service.ProductService;
 import com.distopy.service.UserService;
+import com.distopy.util.CommomUtils;
+import jakarta.mail.MessagingException;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
@@ -17,12 +20,14 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.security.Principal;
 import java.util.List;
+import java.util.UUID;
 
 @Controller
 public class HomeController {
@@ -35,6 +40,9 @@ public class HomeController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private CommomUtils commomUtils;
 
     @ModelAttribute
     public void getUserDetails(Principal p, Model m) {
@@ -123,5 +131,47 @@ public class HomeController {
         }
 
         return "redirect:/register";
+    }
+
+    // Forgot password code
+
+    @GetMapping("/forgot_password")
+    public String showForgotPassword() {
+        return "forgot_password.html";
+    }
+
+    @PostMapping("/forgot_password")
+    public String processForgotPassword(@RequestParam String email, HttpSession session, HttpServletRequest request) throws MessagingException, UnsupportedEncodingException {
+        UserDtls userByEmail = userService.getUserByEmail(email);
+
+        if (ObjectUtils.isEmpty(userByEmail)) {
+            session.setAttribute("errorMsg", "Invalid email address! Please try again!");
+            return "redirect:/forgot_password";
+        } else {
+
+            String resetToken = UUID.randomUUID().toString();
+            userService.updateUserResetToken(email, resetToken);
+
+            /* Generating the URL to redirect the user to reset password
+            * Example: https://localhost:8080/reset_password?token=dajdnafFSAKNFNFfajfnF9291*/
+
+            String url = CommomUtils.generateUrl(request)+"/reset_password?token="+resetToken;
+            System.out.println(url);
+
+            Boolean sendMail = commomUtils.sendMail(url, email);
+
+            if (sendMail) {
+                session.setAttribute("successMsg", "Password reset link was successfully sent to your email!");
+                return "redirect:/signin";
+            } else {
+                session.setAttribute("errorMsg", "Failed to send password reset link!");
+                return "redirect:/forgot_password";
+            }
+        }
+    }
+
+    @GetMapping("/reset_password")
+    public String showResetPassword() {
+        return "reset_password.html";
     }
 }

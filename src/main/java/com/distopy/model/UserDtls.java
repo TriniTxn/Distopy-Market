@@ -49,4 +49,6 @@ public class UserDtls {
     private Integer failedLoginCount;
     
     private Date lockTime;
+
+    private String resetToken;
 }
