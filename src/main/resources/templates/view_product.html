@@ -10,8 +10,18 @@
         <div class="container card-sh" style="margin-top: 70px; margin-bottom: 100px">
             <div class="col-md-12 p-5">
                 <div class="row">
+                    <th:block th:if="${session.successMsg}">
+                        <p class="text-success alert alert-success text-center" role="alert">[[${session.successMsg}]]</p>
+                        <th:block th:text="${@commomServiceImpl.removeSessionMessage()}"></th:block>
+                    </th:block>
+
+                    <th:block th:if="${session.errorMsg}">
+                        <p class="text-danger alert alert-danger text-center" role="alert">[[${session.errorMsg}]]</p>
+                        <th:block th:text="${@commomServiceImpl.removeSessionMessage()}"></th:block>
+                    </th:block>
+
                     <div class="col-md-6 text-end">
-                        <img alt="..." th:src="${product.getImage()}" width="330px" height="400px">
+                        <img th:src="@{/img/product_img/{imageName}(imageName=${product.image})}" width="300px" height="300px">
                     </div>
                     <div class="col-md-6">
                         <p class="fs-3">[[${product.title}]]</p>
@@ -49,7 +59,12 @@
                         </div>
 
                         <th:block th:if="${product.stock > 0}">
-                            <a href="login.jsp" class="btn btn-danger col-md-12">Add To Cart</a>
+                            <th:block th:if="${user == null}">
+                                <a href="/signin" class="btn btn-danger col-md-12">Add To Cart</a>
+                            </th:block>
+                            <th:block th:unless="${user == null}">
+                                <a th:href="@{'/user/addCart?pid='+${product.id}+'&uid='+${user.id}}" class="btn btn-danger col-md-12">Add To Cart</a>
+                            </th:block>
                         </th:block>
                         <th:block th:unless="${product.stock > 0}">
                             <a href="#" class="btn text-white btn-warning col-md-12">Out of Stock</a>

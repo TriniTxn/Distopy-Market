@@ -6,6 +6,79 @@
 - Oracle Database
 - Email account to SMTP
 
+## Data Model
+
+```
++----------------+       +----------------+       +----------------+
+|    UserDtls    |       |    Product     |       |    Category    |
++----------------+       +----------------+       +----------------+
+| id: Integer    |       | id: int        |       | id: int        |
+| name: String   |       | title: String  |       | name: String   |
+| email: String  |       | description:   |       | imageName:     |
+| password:      |       |   String       |       |   String       |
+|   String       |       | category:      |       | isActive:      |
+| mobileNumber:  |       |   String       |       |   Boolean      |
+|   String       |       | price: Double  |       +----------------+
+| address:       |       | stock: int     |
+|   String       |       | image: String  |
+| city: String   |       | discount:      |
+| state: String  |       |   Integer      |
+| pincode:       |       | discountPrice: |
+|   String       |       |   Double       |
+| profileImage:  |       | isActive:      |
+|   String       |       |   Boolean      |
+| role: String   |       +----------------+
+| isEnabled:     |               |
+|   Boolean      |               |
+| accountNon     |               |
+|   Locked:      |               |
+|   Boolean      |               |
+| failedLogin    |               |
+|   Count:       |               |
+|   Integer      |               |
+| lockTime: Date |               |
+| resetToken:    |               |
+|   String       |               |
++----------------+               |
+        |                        |
+        |                        |
+        |                        |
+        v                        v
++----------------+
+|      Cart      |
++----------------+
+| id: Integer    |
+| user: UserDtls |
+| product:       |
+|   Product      |
+| quantity:      |
+|   Integer      |
+| totalPrice:    |
+|   Double       |
++----------------+
+```
+
+### Entity Relationships
+
+1. **UserDtls - Cart**: One-to-Many
+   - A user can have multiple cart items
+   - Each cart item belongs to one user
+
+2. **Product - Cart**: One-to-Many
+   - A product can be in multiple cart items
+   - Each cart item contains one product
+
+3. **Category - Product**: Indirect Relationship
+   - Products have a category field (stored as String)
+   - Categories are managed separately
+
+### Key Features
+
+- User authentication and authorization with role-based access
+- Product catalog with categories
+- Shopping cart functionality
+- Account security features (locking, password reset)
+
 ## Project Structure
 
 ```
