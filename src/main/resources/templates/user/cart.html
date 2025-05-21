@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{base::Layout(~{::section})}">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+</head>
+<body>
+<section>
+  <div class="container-fluid p-5 mt-5">
+    <div class="row">
+      <div class="col-md-10 offset-md-1">
+        <div class="card card-sh">
+          <div class="card-header text-center">
+            <p class="fs-4">Your Cart</p>
+            <th:block th:if="${session.successMsg}">
+              <p class="text-success fw-bold">[[${session.successMsg}]]</p>
+              <th:block th:text="${@commomServiceImpl.removeSessionMessage()}"></th:block>
+            </th:block>
+
+            <th:block th:if="${session.errorMsg}">
+              <p class="text-danger fw-bold">[[${session.errorMsg}]]</p>
+              <th:block th:text="${@commomServiceImpl.removeSessionMessage()}"></th:block>
+            </th:block>
+          </div>
+          <div class="card-body text-center">
+            <table class="table">
+              <thead>
+              <tr>
+                <th scope="col">Sl No</th>
+                <th scope="col">Image</th>
+                <th scope="col">Product Name</th>
+                <th scope="col">Price</th>
+                <th scope="col">Quantity</th>
+                <th scope="col">Total Price</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr th:each="cart,c:${carts}">
+                <th scope="row">[[${c.count}]]</th>
+                <td><img th:src="@{'/img/product_img/'+${cart.product.image}}" width="70px" height="70px"></td>
+                <td>[[${cart.product.title}]]</td>
+                <td>[[${cart.product.discountPrice}]]</td>
+                <td>[[${cart.quantity}]]</td>
+                <td>[[${cart.totalPrice}]]</td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</body>
+</html>

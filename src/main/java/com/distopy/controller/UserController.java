@@ -61,4 +61,17 @@ public class UserController {
         }
         return "redirect:/product/" + pid;
     }
+
+    @GetMapping("/cart")
+    public String loadCartPage(Principal p, Model m) {
+        UserDtls user = getLoggedInUserDetails(p);
+        List<Cart> carts = cartService.getCartsByUserId(user.getId());
+        m.addAttribute("carts", carts);
+        return "/user/cart";
+    }
+
+    private UserDtls getLoggedInUserDetails(Principal p) {
+        String email = p.getName();
+        return userService.getUserByEmail(email);
+    }
 }

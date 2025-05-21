@@ -3,6 +3,7 @@ package com.distopy.controller;
 import com.distopy.model.Category;
 import com.distopy.model.Product;
 import com.distopy.model.UserDtls;
+import com.distopy.service.CartService;
 import com.distopy.service.CategoryService;
 import com.distopy.service.ProductService;
 import com.distopy.service.UserService;
@@ -48,13 +49,21 @@ public class HomeController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private CartService cartService;
+
     @ModelAttribute
     public void getUserDetails(Principal p, Model m) {
 
         if (p != null) {
             String email = p.getName();
             UserDtls userDtls = userService.getUserByEmail(email);
+
+            /* Essa linha de código m.addAttribute serve para você poder utilizar esse parametro no HTML utilizando
+            * Ex: [[${user.getId}]] */
             m.addAttribute("user", userDtls);
+            Integer countCart = cartService.getCountCart(userDtls.getId());
+            m.addAttribute("countCart", countCart);
         } else {
             m.addAttribute("user", null);
         }

@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -51,6 +52,26 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public List<Cart> getCartsByUserId(Integer userId) {
-        return null;
+        List<Cart> carts = cartRepository.findByUserId(userId);
+
+        Double totalOrderPrice = 0.0;
+        List<Cart> updateCarts = new ArrayList<>();
+
+        for (Cart cart : carts) {
+            Double totalPrice = (cart.getProduct().getDiscountPrice() * cart.getQuantity());
+            cart.setTotalPrice(totalPrice);
+
+            totalOrderPrice += totalPrice;
+            cart.setTotalOrderPrice(totalOrderPrice);
+            updateCarts.add(cart);
+        }
+
+        return updateCarts;
+    }
+
+    @Override
+    public Integer getCountCart(Integer userId) {
+
+         return cartRepository.countByUserId(userId);
     }
 }
