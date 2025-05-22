@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{base::Layout(~{::section})}">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+</head>
+<body>
+<section>
+  <div class="container mt-5 p-5">
+    <div class="row">
+      <div class="col-md-6 mt-2">
+        <form>
+          <div class="mb-3 row">
+            <p class="text-center fs-2">Fill Address</p>
+            <hr>
+            <div class="col p-1">
+              <label>First Name</label>
+              <input class="form-control mt-1" type="text" name="firstName" placeholder="First Name">
+            </div>
+            <div class="col p-1">
+              <label>Last Name</label>
+              <input class="form-control col mt-1" type="text" name="lastName" placeholder="Last Name">
+            </div>
+          </div>
+          <div class="mb-3 row">
+            <div class="col p-1">
+              <label>Email</label>
+              <input class="form-control col mt-1" type="email" name="email" placeholder="Email">
+            </div>
+            <div class="col p-1">
+              <label>Mobile Number</label>
+              <input class="form-control col mt-1" type="text" name="mobileNumber" placeholder="Mobile Number">
+            </div>
+          </div>
+          <div class="mb-3 row">
+            <div class="col p-1">
+              <label>Address</label>
+              <input class="form-control col mt-1" type="text" name="address" placeholder="Address">
+            </div>
+            <div class="col p-1">
+              <label>City</label>
+              <input class="form-control col mt-1" type="text" name="city" placeholder="City">
+            </div>
+          </div>
+          <div class="mb-3 row">
+            <div class="col p-1">
+              <label>State</label>
+              <input class="form-control col mt-1" type="text" name="state" placeholder="State">
+            </div>
+            <div class="col p-1">
+              <label>Pin code</label>
+              <input class="form-control col mt-1" type="text" name="pincode" placeholder="Pin code">
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="col-md-6 mt-2">
+        <p class="text-center fs-2">Payment Type</p>
+        <hr>
+        <div class="card">
+          <div class="card-body">
+            <table class="table table-borderless">
+              <tbody>
+                <tr>
+                  <td>Total Price</td>
+                  <td>:</td>
+                  <td>&#36; 23525</td>
+                </tr>
+                <tr>
+                  <td>Delivery Fee</td>
+                  <td>:</td>
+                  <td>&#36; 23</td>
+                </tr>
+                <tr>
+                  <td>Tax</td>
+                  <td>:</td>
+                  <td>&#36; 23525</td>
+                </tr>
+                <tr class="border-1">
+                  <td>Total Price</td>
+                  <td>:</td>
+                  <td>&#36; 23525</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card shadow p-3 mb-5 mt-2 bg-body-tertiary rounded">
+          <div class="card-body">
+            <form action="/login" method="POST">
+              <div class="mb-3">
+                <label class="form-label">Select Payment Type</label>
+                <select>
+                  <option>---Select---</option>
+                  <option>Cash on Delivery</option>
+                  <option>Online Payment</option>
+                </select>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Password</label>
+                <input class="form-control" name="password" type="password">
+              </div>
+              <button type="submit" class="btn bg-primary text-white col-md-12">Login</button>
+            </form>
+          </div>
+          <div class="card-footer text-center">
+            <a href="/forgot_password" class="text-decoration-none">Forgot Password?</a><br> Don't have an account?
+            <a href="/register">Register Here</a><br>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</body>
+</html>

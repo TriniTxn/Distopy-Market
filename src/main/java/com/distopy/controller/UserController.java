@@ -84,4 +84,9 @@ public class UserController {
         String email = p.getName();
         return userService.getUserByEmail(email);
     }
+
+    @GetMapping("/orders")
+    public String orderPage() {
+        return "/user/order";
+    }
 }
