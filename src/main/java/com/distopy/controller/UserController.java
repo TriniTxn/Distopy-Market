@@ -2,8 +2,10 @@ package com.distopy.controller;
 
 import com.distopy.model.Cart;
 import com.distopy.model.Category;
+import com.distopy.model.OrderRequest;
 import com.distopy.model.UserDtls;
 import com.distopy.service.CartService;
+import com.distopy.service.OrderService;
 import com.distopy.service.UserService;
 import com.distopy.service.impl.CategoryServiceImpl;
 import jakarta.servlet.http.HttpSession;
@@ -11,10 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.ObjectUtils;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.List;
@@ -31,6 +30,9 @@ public class UserController {
 
     @Autowired
     private CartService cartService;
+
+    @Autowired
+    private OrderService orderService;
 
     @GetMapping("/")
     public String home() {
@@ -88,5 +90,13 @@ public class UserController {
     @GetMapping("/orders")
     public String orderPage() {
         return "/user/order";
+    }
+
+    @PostMapping("/saveOrder")
+    public String saveOrder(@ModelAttribute OrderRequest request, Principal p){
+        UserDtls user = getLoggedInUserDetails(p);
+        orderService.saveOrder(user.getId(), request);
+
+        return "/user/success";
     }
 }
