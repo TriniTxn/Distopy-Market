@@ -67,7 +67,17 @@ public class UserController {
         UserDtls user = getLoggedInUserDetails(p);
         List<Cart> carts = cartService.getCartsByUserId(user.getId());
         m.addAttribute("carts", carts);
+        if (carts.size() > 0) {
+            Double totalOrderPrice = carts.get(carts.size() - 1).getTotalOrderPrice();
+            m.addAttribute("totalOrderPrice", totalOrderPrice);
+        }
         return "/user/cart";
+    }
+
+    @GetMapping("/cartQuantityUpdate")
+    public String updateCartQuantity(@RequestParam String sy, @RequestParam Integer cid) {
+        cartService.updateQuantity(sy, cid);
+        return "redirect:/user/cart";
     }
 
     private UserDtls getLoggedInUserDetails(Principal p) {
