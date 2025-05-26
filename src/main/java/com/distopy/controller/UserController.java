@@ -1,13 +1,11 @@
 package com.distopy.controller;
 
-import com.distopy.model.Cart;
-import com.distopy.model.Category;
-import com.distopy.model.OrderRequest;
-import com.distopy.model.UserDtls;
+import com.distopy.model.*;
 import com.distopy.service.CartService;
 import com.distopy.service.OrderService;
 import com.distopy.service.UserService;
 import com.distopy.service.impl.CategoryServiceImpl;
+import com.distopy.util.OrderStatus;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -112,5 +110,35 @@ public class UserController {
     @GetMapping("/success")
     public String loadSuccess() {
         return "user/success";
+    }
+
+    @GetMapping("/userOrders")
+    public String myOrder(Model m, Principal p) {
+        UserDtls loggedInUserDetails = getLoggedInUserDetails(p);
+        List<ProductOrder> orders = orderService.getOrdersByUserId(loggedInUserDetails.getId());
+        m.addAttribute("orders", orders);
+        return "/user/my_orders";
+    }
+
+    @GetMapping("/update_status")
+    public String updateOrderStatus(@RequestParam Integer id, @RequestParam Integer st, HttpSession session) {
+        OrderStatus[] values = OrderStatus.values();
+        String status = null;
+
+        for (OrderStatus orderSt : values) {
+            if (orderSt.getId().equals(st)) {
+                status = orderSt.getName();
+            }
+        }
+
+        Boolean updateOrder = orderService.updateOrderStatus(id, status);
+
+        if (updateOrder) {
+            session.setAttribute("successMsg", "Order status updated successfully!");
+        } else {
+            session.setAttribute("errorMsg", "Something went wrong while updating order status!");
+        }
+
+        return "redirect:/user/userOrders";
     }
 }

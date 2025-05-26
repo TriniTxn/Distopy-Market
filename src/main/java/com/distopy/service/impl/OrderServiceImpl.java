@@ -6,13 +6,16 @@ import com.distopy.model.OrderRequest;
 import com.distopy.model.ProductOrder;
 import com.distopy.repository.CartRepository;
 import com.distopy.repository.ProductOrderRepository;
+import com.distopy.repository.ProductRepository;
 import com.distopy.service.OrderService;
 import com.distopy.util.OrderStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -23,6 +26,8 @@ public class OrderServiceImpl implements OrderService {
 
     @Autowired
     private CartRepository cartRepository;
+    @Autowired
+    private ProductRepository productRepository;
 
     @Override
     public void saveOrder(Integer userId, OrderRequest orderRequest) {
@@ -31,7 +36,7 @@ public class OrderServiceImpl implements OrderService {
         for (Cart cart : carts) {
             ProductOrder order = new ProductOrder();
             order.setOrderId(UUID.randomUUID().toString());
-            order.setOrderDate(new Date());
+            order.setOrderDate(LocalDate.now());
 
             order.setProduct(cart.getProduct());
             order.setPrice(cart.getProduct().getDiscountPrice());
@@ -42,22 +47,45 @@ public class OrderServiceImpl implements OrderService {
             order.setStatus(OrderStatus.IN_PROGRESS.getName());
             order.setPaymentType(orderRequest.getPaymentType());
 
-            OrderAddress address = new OrderAddress();
-            address.setFirstName(orderRequest.getFirstName());
-            address.setLastName(orderRequest.getLastName());
-
-            address.setEmail(orderRequest.getEmail());
-            address.setMobileNumber(orderRequest.getMobileNumber());
-
-            address.setAddress(orderRequest.getAddress());
-            address.setCity(orderRequest.getCity());
-
-            address.setState(orderRequest.getState());
-            address.setPincode(orderRequest.getPincode());
+            OrderAddress address = getOrderAddress(orderRequest);
 
             order.setOrderAddress(address);
 
             orderRepository.save(order);
         }
+    }
+
+    private static OrderAddress getOrderAddress(OrderRequest orderRequest) {
+        OrderAddress address = new OrderAddress();
+        address.setFirstName(orderRequest.getFirstName());
+        address.setLastName(orderRequest.getLastName());
+
+        address.setEmail(orderRequest.getEmail());
+        address.setMobileNumber(orderRequest.getMobileNumber());
+
+        address.setAddress(orderRequest.getAddress());
+        address.setCity(orderRequest.getCity());
+
+        address.setState(orderRequest.getState());
+        address.setPincode(orderRequest.getPincode());
+        return address;
+    }
+
+    @Override
+    public List<ProductOrder> getOrdersByUserId(Integer userId) {
+        return orderRepository.findByUserId(userId);
+    }
+
+    @Override
+    public Boolean updateOrderStatus(Integer orderId, String status) {
+        Optional<ProductOrder> order = orderRepository.findById(orderId);
+
+        if (order.isPresent()) {
+            ProductOrder productOrder = order.get();
+            productOrder.setStatus(status);
+            orderRepository.save(productOrder);
+            return true;
+        }
+        return false;
     }
 }
