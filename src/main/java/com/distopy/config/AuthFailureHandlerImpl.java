@@ -32,27 +32,32 @@ public class AuthFailureHandlerImpl extends SimpleUrlAuthenticationFailureHandle
 
         UserDtls userDtls = userRepository.findByEmail(email);
 
-        if (userDtls.getIsEnabled()) {
-            if (userDtls.getAccountNonLocked()) {
-                if (userDtls.getFailedLoginCount() < AppConstant.ATTEMPT_TIME) {
-                    userService.increaseFailedLoginAttempts(userDtls);
+        if (userDtls != null) {
+
+            if (userDtls.getIsEnabled()) {
+                if (userDtls.getAccountNonLocked()) {
+                    if (userDtls.getFailedLoginCount() < AppConstant.ATTEMPT_TIME) {
+                        userService.increaseFailedLoginAttempts(userDtls);
+                    } else {
+                        userService.userAccountLock(userDtls);
+                        exception = new LockedException("Your account is locked! You exceeded the maximum number of attempts.");
+                    }
+
                 } else {
-                    userService.userAccountLock(userDtls);
-                    exception = new LockedException("Your account is locked! You exceeded the maximum number of attempts.");
+                    if (userService.unlockAccountTimeExpired(userDtls)) {
+                        exception = new LockedException("Your account is locked! Please login again.");
+                    } else {
+                        exception = new LockedException("Your account is locked! Try again in " + AppConstant.UNLOCK_DURATION_TIME / 60000 + " minutes.");
+                    }
                 }
 
             } else {
-                if (userService.unlockAccountTimeExpired(userDtls)) {
-                    exception = new LockedException("Your account is locked! Please login again.");
-                } else {
-                    exception = new LockedException("Your account is locked! Try again in " + AppConstant.UNLOCK_DURATION_TIME / 60000 + " minutes.");
-                }
+                exception = new LockedException("Your account is inactive!");
             }
-
         } else {
-            exception = new LockedException("Your account is inactive!");
+            exception = new LockedException("Email or Password is incorrect!");
         }
-        super.setDefaultFailureUrl("/signin?error");
-        super.onAuthenticationFailure(request, response, exception);
+            super.setDefaultFailureUrl("/signin?error");
+            super.onAuthenticationFailure(request, response, exception);
+        }
     }
-}
