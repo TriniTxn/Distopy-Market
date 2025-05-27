@@ -1,16 +1,19 @@
 package com.distopy.service;
 
 import com.distopy.model.OrderRequest;
-import com.distopy.model.Product;
 import com.distopy.model.ProductOrder;
+import jakarta.mail.MessagingException;
 
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 public interface OrderService {
 
-    void saveOrder(Integer userId, OrderRequest orderRequest);
+    void saveOrder(Integer userId, OrderRequest orderRequest) throws MessagingException, UnsupportedEncodingException;
 
     List<ProductOrder> getOrdersByUserId(Integer userId);
 
-    Boolean updateOrderStatus(Integer orderId, String status);
+    ProductOrder updateOrderStatus(Integer orderId, String status);
+
+    List<ProductOrder> getAllOrders();
 }

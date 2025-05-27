@@ -8,12 +8,14 @@ import com.distopy.repository.CartRepository;
 import com.distopy.repository.ProductOrderRepository;
 import com.distopy.repository.ProductRepository;
 import com.distopy.service.OrderService;
+import com.distopy.util.CommomUtils;
 import com.distopy.util.OrderStatus;
+import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.UnsupportedEncodingException;
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -26,11 +28,15 @@ public class OrderServiceImpl implements OrderService {
 
     @Autowired
     private CartRepository cartRepository;
+
     @Autowired
     private ProductRepository productRepository;
 
+    @Autowired
+    private CommomUtils commomUtils;
+
     @Override
-    public void saveOrder(Integer userId, OrderRequest orderRequest) {
+    public void saveOrder(Integer userId, OrderRequest orderRequest) throws MessagingException, UnsupportedEncodingException {
         List<Cart> carts = cartRepository.findByUserId(userId);
 
         for (Cart cart : carts) {
@@ -51,7 +57,8 @@ public class OrderServiceImpl implements OrderService {
 
             order.setOrderAddress(address);
 
-            orderRepository.save(order);
+            ProductOrder savedOrder = orderRepository.save(order);
+            commomUtils.sendMailForProductOrder(savedOrder, "Successful");
         }
     }
 
@@ -77,15 +84,20 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Boolean updateOrderStatus(Integer orderId, String status) {
+    public ProductOrder updateOrderStatus(Integer orderId, String status) {
         Optional<ProductOrder> order = orderRepository.findById(orderId);
 
         if (order.isPresent()) {
             ProductOrder productOrder = order.get();
             productOrder.setStatus(status);
-            orderRepository.save(productOrder);
-            return true;
+            ProductOrder updatedOrder = orderRepository.save(productOrder);
+            return updatedOrder;
         }
-        return false;
+        return null;
+    }
+
+    @Override
+    public List<ProductOrder> getAllOrders() {
+        return orderRepository.findAll();
     }
 }

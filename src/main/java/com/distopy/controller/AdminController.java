@@ -2,10 +2,15 @@ package com.distopy.controller;
 
 import com.distopy.model.Category;
 import com.distopy.model.Product;
+import com.distopy.model.ProductOrder;
 import com.distopy.model.UserDtls;
 import com.distopy.service.CategoryService;
+import com.distopy.service.OrderService;
 import com.distopy.service.ProductService;
 import com.distopy.service.UserService;
+import com.distopy.util.CommomUtils;
+import com.distopy.util.OrderStatus;
+import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
@@ -17,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -37,6 +43,12 @@ public class AdminController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private OrderService orderService;
+
+    @Autowired
+    private CommomUtils commomUtils;
 
     @ModelAttribute
     public void getUserDetails(Principal p, Model m) {
@@ -254,5 +266,42 @@ public class AdminController {
         }
 
         return "redirect:/admin/users";
+    }
+
+    @GetMapping("/orders")
+    public String getAllOrders(Model m) {
+        List<ProductOrder> allOrders = orderService.getAllOrders();
+        m.addAttribute("orders", allOrders);
+        return "/admin/orders";
+    }
+
+    @PostMapping("/update_order_status")
+    public String updateOrderStatus(@RequestParam Integer id, @RequestParam Integer st, HttpSession session) {
+        OrderStatus[] values = OrderStatus.values();
+        String status = null;
+
+        for (OrderStatus orderSt : values) {
+            if (orderSt.getId().equals(st)) {
+                status = orderSt.getName();
+            }
+        }
+
+        ProductOrder updateOrder = orderService.updateOrderStatus(id, status);
+
+        try {
+            commomUtils.sendMailForProductOrder(updateOrder, status);
+        } catch (MessagingException e) {
+            throw new RuntimeException(e);
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
+
+        if (ObjectUtils.isEmpty(updateOrder)) {
+            session.setAttribute("successMsg", "Order status updated successfully!");
+        } else {
+            session.setAttribute("errorMsg", "Something went wrong while updating order status!");
+        }
+
+        return "redirect:/admin/orders";
     }
 }

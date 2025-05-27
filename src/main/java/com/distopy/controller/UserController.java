@@ -5,7 +5,9 @@ import com.distopy.service.CartService;
 import com.distopy.service.OrderService;
 import com.distopy.service.UserService;
 import com.distopy.service.impl.CategoryServiceImpl;
+import com.distopy.util.CommomUtils;
 import com.distopy.util.OrderStatus;
+import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -13,6 +15,7 @@ import org.springframework.ui.Model;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.UnsupportedEncodingException;
 import java.security.Principal;
 import java.util.List;
 
@@ -31,6 +34,9 @@ public class UserController {
 
     @Autowired
     private OrderService orderService;
+
+    @Autowired
+    private CommomUtils commomUtils;
 
     @GetMapping("/")
     public String home() {
@@ -100,7 +106,7 @@ public class UserController {
     }
 
     @PostMapping("/saveOrder")
-    public String saveOrder(@ModelAttribute OrderRequest request, Principal p){
+    public String saveOrder(@ModelAttribute OrderRequest request, Principal p) throws MessagingException, UnsupportedEncodingException {
         UserDtls user = getLoggedInUserDetails(p);
         orderService.saveOrder(user.getId(), request);
 
@@ -131,9 +137,17 @@ public class UserController {
             }
         }
 
-        Boolean updateOrder = orderService.updateOrderStatus(id, status);
+        ProductOrder updateOrder = orderService.updateOrderStatus(id, status);
+        try {
+            commomUtils.sendMailForProductOrder(updateOrder, status);
+        } catch (Exception e) {
+            e.printStackTrace();
+            session.setAttribute("errorMsg", "Something went wrong while sending email!");
+            return "redirect:/user/userOrders";
 
-        if (updateOrder) {
+        }
+
+        if (!ObjectUtils.isEmpty(updateOrder)) {
             session.setAttribute("successMsg", "Order status updated successfully!");
         } else {
             session.setAttribute("errorMsg", "Something went wrong while updating order status!");

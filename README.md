@@ -5,7 +5,6 @@
 - Maven
 - Oracle Database
 - Email account to SMTP
-- 
 ### Entity Relationships
 
 1. **UserDtls - Cart**: One-to-Many

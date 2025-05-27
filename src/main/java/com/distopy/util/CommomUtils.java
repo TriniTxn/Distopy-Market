@@ -1,5 +1,6 @@
 package com.distopy.util;
 
+import com.distopy.model.ProductOrder;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.servlet.http.HttpServletRequest;
@@ -39,4 +40,36 @@ public class CommomUtils {
 
         return siteUrl.replace(request.getServletPath(), "");
     }
+
+    String msg = "<p>[[name]]</p><br><p>Thank you for ordering.</p>"
+            + "<p><b>[[orderStatus]]</b></p>"
+            + "<p><b>Product Details: </b></p>"
+            + "<p>Name: [[productName]]</p>"
+            + "<p>Category: [[category]]</p>"
+            + "<p>Quantity: [[quantity]]</p>"
+            + "<p>Price: [[price]]</p>"
+            + "<p>Payment Type: [[paymentType]]</p>";
+
+
+    public Boolean sendMailForProductOrder(ProductOrder order, String status) throws MessagingException, UnsupportedEncodingException {
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message);
+
+        helper.setFrom("giovannisounds.dev@gmail.com", "Distopy Market - Password Reset");
+        helper.setTo(order.getOrderAddress().getEmail());
+
+        msg = msg.replace("[[name]]", order.getOrderAddress().getFirstName() + " " + order.getOrderAddress().getLastName());
+        msg = msg.replace("[[orderStatus]]", status);
+        msg = msg.replace("[[productName]]", order.getProduct().getTitle());
+        msg = msg.replace("[[category]]", order.getProduct().getCategory());
+        msg = msg.replace("[[quantity]]", order.getQuantity().toString());
+        msg = msg.replace("[[price]]", order.getPrice().toString());
+        msg = msg.replace("[[paymentType]]", order.getPaymentType());
+
+        helper.setSubject("Product Order Status");
+        helper.setText(msg, true);
+        mailSender.send(message);
+        return true;
+    }
+
 }
