@@ -155,4 +155,9 @@ public class UserController {
 
         return "redirect:/user/userOrders";
     }
+
+    @GetMapping("/profile")
+    public String profile() {
+        return "/user/profile";
+    }
 }
