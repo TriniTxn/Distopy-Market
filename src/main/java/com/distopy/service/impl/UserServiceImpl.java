@@ -1,5 +1,6 @@
 package com.distopy.service.impl;
 
+import com.distopy.model.Category;
 import com.distopy.model.UserDtls;
 import com.distopy.repository.UserRepository;
 import com.distopy.service.UserService;
@@ -8,10 +9,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -21,6 +30,8 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private UserService userService;
 
     @Override
     public UserDtls saveUser(UserDtls user) {
@@ -116,5 +127,50 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDtls updateUser(UserDtls user) {
         return userRepository.save(user);
+    }
+
+    @Override
+    public UserDtls updateUserProfile(UserDtls user, MultipartFile img) {
+        if (user == null || user.getId() == null) {
+            throw new IllegalArgumentException("User can not be null or empty.");
+        }
+
+        UserDtls dbUser = userRepository.findById(user.getId())
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        dbUser.setName(user.getName());
+        dbUser.setMobileNumber(user.getMobileNumber());
+        dbUser.setAddress(user.getAddress());
+        dbUser.setCity(user.getCity());
+        dbUser.setState(user.getState());
+        dbUser.setPincode(user.getPincode());
+
+        try {
+            if (img != null && !img.isEmpty()) {
+                String contentType = img.getContentType();
+                if (contentType == null || !contentType.startsWith("image/")) {
+                    throw new IllegalArgumentException("File must be an image.");
+                }
+
+                String imageName = UUID.randomUUID().toString() + ".jpg";
+
+                Path uploadDir = Paths.get("src/main/resources/static/img/profile_img");
+
+                if (!Files.exists(uploadDir)) {
+                    Files.createDirectories(uploadDir);
+                }
+
+                Path imagePath = uploadDir.resolve(imageName);
+
+                Files.copy(img.getInputStream(), imagePath, StandardCopyOption.REPLACE_EXISTING);
+
+                dbUser.setProfileImage(imageName);
+            }
+
+            return userRepository.save(dbUser);
+
+        } catch (IOException e) {
+            throw new RuntimeException("Error while processing the profile image: " + e.getMessage(), e);
+        }
     }
 }

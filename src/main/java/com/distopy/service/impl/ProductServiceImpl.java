@@ -20,6 +20,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.Locale;
+import java.util.UUID;
 
 @Service
 public class ProductServiceImpl implements ProductService {
@@ -99,11 +100,19 @@ public class ProductServiceImpl implements ProductService {
 
             if(!image.isEmpty()){
                 try {
-                    File saveFile = new ClassPathResource("static/img").getFile();
+                    String customImageName = UUID.randomUUID().toString() + ".jpg";
 
-                    Path path = Paths.get(saveFile.getAbsolutePath() + "/product_img/" + image.getOriginalFilename());
+                    Path uploadDir = Paths.get("src/main/resources/static/img/product_img");
 
-                    Files.copy(image.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
+                    if (!Files.exists(uploadDir)) {
+                        Files.createDirectories(uploadDir);
+                    }
+                    Path imagePath = uploadDir.resolve(customImageName);
+
+                    Files.copy(image.getInputStream(), imagePath, StandardCopyOption.REPLACE_EXISTING);
+
+                    dbProduct.setImage(customImageName);
+                    updatedProduct = productRepository.save(dbProduct);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

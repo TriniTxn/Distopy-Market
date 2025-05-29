@@ -12,64 +12,74 @@
             <div class="col-md-10 offset-md-1 text-center">
                 <div class="card-body">
                     <p class="fs-3 text-center">My Profile</p>
+                    <th:block th:if="${session.successMsg}">
+                        <p class="text-success fw-bold">[[${session.successMsg}]]</p>
+                        <th:block th:text="${@commomServiceImpl.removeSessionMessage()}"></th:block>
+                    </th:block>
+
+                    <th:block th:if="${session.errorMsg}">
+                        <p class="text-danger fw-bold">[[${session.errorMsg}]]</p>
+                        <th:block th:text="${@commomServiceImpl.removeSessionMessage()}"></th:block>
+                    </th:block>
                     <hr>
                     <div class="text-center">
-                        <img alt="" th:src="@{'/img/profile_img/'+${user.profileImage}}" class="border p-2"
+                        <img alt="" th:src="@{'../img/profile_img/'+${user.profileImage}}" class="border p-2"
                              style="width: 110px; height: 110px; border-radius: 50%;">
                     </div>
                     <div class="col-md-8 offset-md-2 mt-4">
                         <table class="table table-borderless">
                             <tbody>
-                            <form>
+                            <form action="/user/update_profile" method="POST" enctype="multipart/form-data">
                                 <tr>
                                     <th scope="row">Name</th>
                                     <td>:</td>
-                                    <td><input type="text" name="" class="form-control" th:value="${user.name}"></td>
+                                    <td><input type="text" name="name" class="form-control" th:value="${user.name}"></td>
                                 </tr>
                                 <tr>
                                     <th scope="row">Mobile Number</th>
                                     <td>:</td>
-                                    <td><input type="text" name="" class="form-control" th:value="${user.mobileNumber}"></td>
+                                    <td><input type="text" name="mobileNumber" class="form-control" th:value="${user.mobileNumber}"></td>
                                 </tr>
                                 <tr>
                                     <th scope="row">Email</th>
                                     <td>:</td>
-                                    <td><input type="text" name="" class="form-control" th:value="${user.email}" readonly></td>
+                                    <td><input type="text" name="email" class="form-control" th:value="${user.email}" readonly></td>
                                 </tr>
                                 <tr>
                                     <th scope="row">Address</th>
                                     <td>:</td>
-                                    <td><input type="text" name="" class="form-control" th:value="${user.address}"></td>
+                                    <td><input type="text" name="address" class="form-control" th:value="${user.address}"></td>
                                 </tr>
                                 <tr>
                                     <th scope="row">City</th>
                                     <td>:</td>
-                                    <td><input type="text" name="" class="form-control" th:value="${user.city}"></td>
+                                    <td><input type="text" name="city" class="form-control" th:value="${user.city}"></td>
                                 </tr>
                                 <tr>
                                     <th scope="row">State</th>
                                     <td>:</td>
-                                    <td><input type="text" name="" class="form-control" th:value="${user.state}"></td>
+                                    <td><input type="text" name="state" class="form-control" th:value="${user.state}"></td>
                                 </tr>
                                 <tr>
                                     <th scope="row">Pincode</th>
                                     <td>:</td>
-                                    <td><input type="text" name="" class="form-control" th:value="${user.pincode}"></td>
+                                    <td><input type="text" name="pincode" class="form-control" th:value="${user.pincode}"></td>
                                 </tr>
                                 <tr>
                                     <th scope="row">Image</th>
                                     <td>:</td>
-                                    <td><input type="file" name="" class="form-control"></td>
+                                    <td><input type="file" name="img" class="form-control"></td>
                                 </tr>
                                 <tr>
                                     <th scope="row">Role</th>
                                     <td>:</td>
-                                    <td><input type="text" name="" class="form-control" readonly th:value="${user.role}"></td>
+                                    <td><input type="text" name="role" class="form-control" readonly th:value="${user.role}"></td>
                                 </tr>
                                 <tr>
                                     <th scope="row">Account Status</th>
                                     <td>:</td>
-                                    <td><input type="text" name="" class="form-control" readonly th:value="${user.isEnabled}"></td>
+                                    <td><input type="text" name="accountStatus" class="form-control" readonly th:value="${user.isEnabled}">
+                                    <input type="hidden" th:value="${user.id}" name="id"></td>
                                 </tr>
                                 <tr class="">
                                     <td class="">

@@ -29,6 +29,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.security.Principal;
 import java.util.List;
+import java.util.UUID;
 
 
 @Controller
@@ -86,16 +87,18 @@ public class AdminController {
     public String saveCategory(@ModelAttribute Category category,
                                @RequestParam("file") MultipartFile file,
                                HttpSession session) {
-
         try {
             if (!file.isEmpty()) {
-                // Cria o nome da imagem baseado no nome da categoria
-                String imageName = category.getName().trim().replaceAll("\\s+", "_") + ".jpg";
+                String imageName = UUID.randomUUID().toString() + ".jpg";
 
-                // Caminho real onde a imagem será salva
-                Path imagePath = Paths.get("src/main/resources/static/img/category_img/" + imageName);
+                Path uploadDir = Paths.get("src/main/resources/static/img/category_img");
 
-                // Salva a imagem no diretório
+                if (!Files.exists(uploadDir)) {
+                    Files.createDirectories(uploadDir);
+                }
+
+                Path imagePath = uploadDir.resolve(imageName);
+
                 Files.copy(file.getInputStream(), imagePath, StandardCopyOption.REPLACE_EXISTING);
 
                 category.setImageName(imageName);
@@ -103,7 +106,6 @@ public class AdminController {
                 category.setImageName("default.jpg");
             }
 
-            // Verifica se já existe categoria com mesmo nome
             if (categoryService.existCategory(category.getName())) {
                 session.setAttribute("errorMsg", "Category name already exists");
             } else {
@@ -146,25 +148,27 @@ public class AdminController {
                                  HttpSession session) throws IOException {
 
         Category oldCategory = categoryService.getCategoryById(category.getId());
-        String filename = file.isEmpty() ? oldCategory.getImageName() : file.getOriginalFilename();
+        String imageName = file.isEmpty() ? oldCategory.getImageName() : UUID.randomUUID().toString() + ".jpg";
 
         if(!ObjectUtils.isEmpty(category)){
-
             oldCategory.setName(category.getName());
             oldCategory.setIsActive(category.getIsActive());
-            oldCategory.setImageName(filename);
+            oldCategory.setImageName(imageName);
         }
 
         Category updatedCategory = categoryService.saveCategory(oldCategory);
 
         if(!ObjectUtils.isEmpty(updatedCategory)){
-
             if(!file.isEmpty()){
-                File saveFile = new ClassPathResource("static/img").getFile();
+                Path uploadDir = Paths.get("src/main/resources/static/img/category_img");
 
-                Path path = Paths.get(saveFile.getAbsolutePath() + "/category_img/" + file.getOriginalFilename());
+                if (!Files.exists(uploadDir)) {
+                    Files.createDirectories(uploadDir);
+                }
 
-                Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
+                Path imagePath = uploadDir.resolve(imageName);
+
+                Files.copy(file.getInputStream(), imagePath, StandardCopyOption.REPLACE_EXISTING);
             }
             session.setAttribute("successMsg", "Category updated successfully!");
         } else {
@@ -177,7 +181,7 @@ public class AdminController {
     @PostMapping("/saveProduct")
     public String saveProduct(@ModelAttribute Product product, @RequestParam("file") MultipartFile image, HttpSession session) throws IOException{
 
-        String imageName = image.isEmpty() ? "default.jpg" : image.getOriginalFilename();
+        String imageName = image.isEmpty() ? "default.jpg" : UUID.randomUUID().toString() + ".jpg";
         product.setImage(imageName);
         product.setDiscount(0);
         product.setDiscountPrice(product.getPrice());
@@ -185,16 +189,17 @@ public class AdminController {
         Product savedProduct = productService.saveProduct(product);
 
         if (!ObjectUtils.isEmpty(savedProduct)) {
+            if (!image.isEmpty()) {
+                Path uploadDir = Paths.get("src/main/resources/static/img/product_img");
 
-            File savedImg = new ClassPathResource("static/img").getFile();
-            File productImgDir = new File(savedImg, "product_img");
+                if (!Files.exists(uploadDir)) {
+                    Files.createDirectories(uploadDir);
+                }
 
-            if (!productImgDir.exists()) {
-                productImgDir.mkdirs();
+                Path imagePath = uploadDir.resolve(imageName);
+
+                Files.copy(image.getInputStream(), imagePath, StandardCopyOption.REPLACE_EXISTING);
             }
-
-            Path path = Paths.get(productImgDir.getAbsolutePath(), image.getOriginalFilename());
-            Files.copy(image.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
 
             session.setAttribute("successMsg", "Product saved successfully!");
         } else {

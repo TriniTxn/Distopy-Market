@@ -14,7 +14,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.Principal;
 import java.util.List;
@@ -159,5 +161,17 @@ public class UserController {
     @GetMapping("/profile")
     public String profile() {
         return "/user/profile";
+    }
+
+    @PostMapping("/update_profile")
+    public String updateProfile(@ModelAttribute UserDtls user, @RequestParam("img") MultipartFile img, HttpSession session) throws IOException {
+        UserDtls updateUserProfile = userService.updateUserProfile(user, img);
+
+        if (ObjectUtils.isEmpty(updateUserProfile)) {
+            session.setAttribute("errorMsg", "Something went wrong while updating profile!");
+        } else {
+            session.setAttribute("successMsg", "Profile updated successfully!");
+        }
+        return "redirect:/user/profile";
     }
 }
