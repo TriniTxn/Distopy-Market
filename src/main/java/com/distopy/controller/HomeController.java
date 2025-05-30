@@ -215,4 +215,13 @@ public class HomeController {
             return "redirect:/signin";
         }
     }
+
+    @GetMapping("/search")
+    public String searchProduct(@RequestParam String ch, Model m) {
+        List<Product> searchProduct = productService.getSearchedProduct(ch);
+        m.addAttribute("products", searchProduct);
+        List<Category> categories = categoryService.getAllActiveCategory();
+        m.addAttribute("categories", categories);
+        return "product";
+    }
 }
