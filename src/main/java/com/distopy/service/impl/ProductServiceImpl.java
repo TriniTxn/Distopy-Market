@@ -5,6 +5,9 @@ import com.distopy.repository.ProductRepository;
 import com.distopy.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.WebDataBinder;
@@ -137,5 +140,17 @@ public class ProductServiceImpl implements ProductService {
         return productRepository.findByTitleContainingIgnoreCaseOrCategoryContainingIgnoreCase(ch, ch);
     }
 
+    @Override
+    public Page<Product> getAllActiveProductPagination(Integer pageNo, Integer pageSize, String category) {
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
+        Page<Product> products;
 
+        if (ObjectUtils.isEmpty(category)) {
+            products = productRepository.findByIsActiveTrue(pageable);
+        } else {
+            products = productRepository.findByCategory(pageable, category);
+        }
+
+        return products;
+    }
 }
