@@ -1,20 +1,24 @@
 package com.distopy.service;
 
 import com.distopy.model.Category;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
 public interface CategoryService {
 
-    public Category saveCategory(Category category);
+    Category saveCategory(Category category);
 
-    public Boolean existCategory(String name);
+    Boolean existCategory(String name);
 
-    public List<Category> getAllCategory();
+    List<Category> getAllCategory();
 
-    public Boolean deleteCategory(int id);
+    Boolean deleteCategory(int id);
 
-    public Category getCategoryById(int id);
+    Category getCategoryById(int id);
 
-    public List<Category> getAllActiveCategory();
+    List<Category> getAllActiveCategory();
+
+    Page<Category> getAllCategoryPagination(Integer pageNo, Integer pageSize);
 }

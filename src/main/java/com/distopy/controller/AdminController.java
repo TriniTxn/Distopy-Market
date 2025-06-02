@@ -14,6 +14,7 @@ import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.ObjectUtils;
@@ -78,8 +79,21 @@ public class AdminController {
     }
 
     @GetMapping("/category")
-    public String category(Model m){
-        m.addAttribute("categories", categoryService.getAllCategory());
+    public String category(Model m,
+                           @RequestParam(name = "pageNo", defaultValue = "0") Integer pageNo,
+                           @RequestParam(name = "pageSize", defaultValue = "4") Integer pageSize){
+        Page<Category> categoryPagination = categoryService.getAllCategoryPagination(pageNo, pageSize);
+        List<Category> categories = categoryPagination.getContent();
+        m.addAttribute("categories", categories);
+        m.addAttribute("categoriesSize", categories.size());
+
+        m.addAttribute("pageNo", categoryPagination.getNumber());
+        m.addAttribute("pageSize", categoryPagination.getSize());
+        m.addAttribute("totalElements", categoryPagination.getTotalElements());
+        m.addAttribute("totalPages", categoryPagination.getTotalPages());
+        m.addAttribute("isFirst", categoryPagination.isFirst());
+        m.addAttribute("isLast", categoryPagination.isLast());
+
         return "admin/category";
     }
 
@@ -210,17 +224,26 @@ public class AdminController {
     }
 
     @GetMapping("/products")
-    public String loadViewProduct(Model m, @RequestParam(value = "ch", defaultValue = "") String ch) {
+    public String loadViewProduct(Model m,
+                                  @RequestParam(value = "ch", defaultValue = "") String ch,
+                                  @RequestParam(name = "pageNo", defaultValue = "0") Integer pageNo,
+                                  @RequestParam(name = "pageSize", defaultValue = "4") Integer pageSize) {
 
-        List<Product> products;
+        Page<Product> products;
 
         if (ch != null && !ch.isEmpty()) {
-            products = productService.getSearchedProduct(ch);
+            products = productService.searchProductPagination(pageNo, pageSize, ch);
         } else {
-            products = productService.getAllProducts();
+            products = productService.getAllProductsPagination(pageNo, pageSize);
         }
 
-        m.addAttribute("products", products);
+        m.addAttribute("products", products.getContent());
+        m.addAttribute("pageNo", products.getNumber());
+        m.addAttribute("pageSize", products.getSize());
+        m.addAttribute("totalElements", products.getTotalElements());
+        m.addAttribute("totalPages", products.getTotalPages());
+        m.addAttribute("isFirst", products.isFirst());
+        m.addAttribute("isLast", products.isLast());
         return "admin/products";
     }
 
@@ -305,9 +328,7 @@ public class AdminController {
 
         try {
             commomUtils.sendMailForProductOrder(updateOrder, status);
-        } catch (MessagingException e) {
-            throw new RuntimeException(e);
-        } catch (UnsupportedEncodingException e) {
+        } catch (MessagingException | UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }
 
