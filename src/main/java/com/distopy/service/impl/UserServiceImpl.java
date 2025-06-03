@@ -173,4 +173,16 @@ public class UserServiceImpl implements UserService {
             throw new RuntimeException("Error while processing the profile image: " + e.getMessage(), e);
         }
     }
+
+    @Override
+    public UserDtls saveAdmin(UserDtls user) {
+        user.setRole("ROLE_ADMIN");
+        user.setIsEnabled(true);
+        user.setAccountNonLocked(true);
+        user.setFailedLoginCount(0);
+        String encodedPassword = passwordEncoder.encode(user.getPassword());
+        user.setPassword(encodedPassword);
+        UserDtls saveUser = userRepository.save(user);
+        return saveUser;
+    }
 }

@@ -385,4 +385,53 @@ public class AdminController {
         }
         return "admin/orders";
     }
+
+    @GetMapping("/addAdmin")
+    public String loadAddAdmin(){
+        return "/admin/add_admin";
+    }
+
+    @PostMapping("/saveAdmin")
+    public String saveUser(@ModelAttribute UserDtls user,
+                           @RequestParam("img") MultipartFile image,
+                           HttpSession session) {
+
+        try {
+            // Define nome da imagem
+            String imageName = image.isEmpty() ? "default.jpg" : image.getOriginalFilename();
+            user.setProfileImage(imageName);
+
+            // Salva usuário no banco
+            UserDtls savedUser = userService.saveAdmin(user);
+
+            if (!ObjectUtils.isEmpty(savedUser)) {
+                // Se tiver imagem, salva no sistema de arquivos
+                if (!image.isEmpty()) {
+                    File staticImgFolder = new ClassPathResource("static/img").getFile();
+
+                    // Garante que a pasta profile_img exista
+                    File profileImgDir = new File(staticImgFolder, "profile_img");
+                    if (!profileImgDir.exists()) {
+                        profileImgDir.mkdirs(); // cria diretórios se não existirem
+                    }
+
+                    // Define caminho completo da imagem
+                    Path imagePath = Paths.get(profileImgDir.getAbsolutePath(), image.getOriginalFilename());
+
+                    // Copia a imagem para o destino
+                    Files.copy(image.getInputStream(), imagePath, StandardCopyOption.REPLACE_EXISTING);
+                }
+
+                session.setAttribute("successMsg", "Admin saved successfully!");
+            } else {
+                session.setAttribute("errorMsg", "Something went wrong while saving the admin!");
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            session.setAttribute("errorMsg", "Failed to save image: " + e.getMessage());
+        }
+
+        return "redirect:/admin/addAdmin";
+    }
 }

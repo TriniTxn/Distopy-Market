@@ -30,4 +30,6 @@ public interface UserService {
     UserDtls updateUser(UserDtls user);
 
     UserDtls updateUserProfile(UserDtls user, MultipartFile img);
+
+    UserDtls saveAdmin(UserDtls user);
 }
