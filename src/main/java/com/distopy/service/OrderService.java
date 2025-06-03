@@ -3,6 +3,7 @@ package com.distopy.service;
 import com.distopy.model.OrderRequest;
 import com.distopy.model.ProductOrder;
 import jakarta.mail.MessagingException;
+import org.springframework.data.domain.Page;
 
 import java.io.UnsupportedEncodingException;
 import java.util.List;
@@ -18,4 +19,6 @@ public interface OrderService {
     List<ProductOrder> getAllOrders();
 
     ProductOrder getOrdersByOrderId(String orderId);
+
+    Page<ProductOrder> getAllOrdersPagination(Integer pageNo, Integer pageSize);
 }

@@ -306,10 +306,20 @@ public class AdminController {
     }
 
     @GetMapping("/orders")
-    public String getAllOrders(Model m) {
-        List<ProductOrder> allOrders = orderService.getAllOrders();
-        m.addAttribute("orders", allOrders);
+    public String getAllOrders(Model m,
+                               @RequestParam(name = "pageNo", defaultValue = "0") Integer pageNo,
+                               @RequestParam(name = "pageSize", defaultValue = "4") Integer pageSize)
+    {
+        Page<ProductOrder> orderPage = orderService.getAllOrdersPagination(pageNo, pageSize);
+        m.addAttribute("orders", orderPage);
         m.addAttribute("srch", false);
+
+        m.addAttribute("pageNo", orderPage.getNumber());
+        m.addAttribute("pageSize", orderPage.getSize());
+        m.addAttribute("totalElements", orderPage.getTotalElements());
+        m.addAttribute("totalPages", orderPage.getTotalPages());
+        m.addAttribute("isFirst", orderPage.isFirst());
+        m.addAttribute("isLast", orderPage.isLast());
         return "/admin/orders";
     }
 
@@ -342,7 +352,11 @@ public class AdminController {
     }
 
     @GetMapping("/search_order")
-    public String searchProduct(@RequestParam String orderId, Model m, HttpSession session) {
+    public String searchProduct(@RequestParam String orderId,
+                                Model m,
+                                @RequestParam(name = "pageNo", defaultValue = "0") Integer pageNo,
+                                @RequestParam(name = "pageSize", defaultValue = "4") Integer pageSize,
+                                HttpSession session) {
 
         if (orderId != null && !orderId.isEmpty()) {
 
@@ -358,9 +372,16 @@ public class AdminController {
             m.addAttribute("srch", true);
 
         } else {
-            List<ProductOrder> allOrders = orderService.getAllOrders();
-            m.addAttribute("orders", allOrders);
+            Page<ProductOrder> orderPage = orderService.getAllOrdersPagination(pageNo, pageSize);
+            m.addAttribute("orders", orderPage);
             m.addAttribute("srch", false);
+
+            m.addAttribute("pageNo", orderPage.getNumber());
+            m.addAttribute("pageSize", orderPage.getSize());
+            m.addAttribute("totalElements", orderPage.getTotalElements());
+            m.addAttribute("totalPages", orderPage.getTotalPages());
+            m.addAttribute("isFirst", orderPage.isFirst());
+            m.addAttribute("isLast", orderPage.isLast());
         }
         return "admin/orders";
     }

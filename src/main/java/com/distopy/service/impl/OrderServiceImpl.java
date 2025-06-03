@@ -12,6 +12,9 @@ import com.distopy.util.CommomUtils;
 import com.distopy.util.OrderStatus;
 import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.io.UnsupportedEncodingException;
@@ -104,5 +107,11 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public ProductOrder getOrdersByOrderId(String orderId) {
         return orderRepository.findByOrderId(orderId);
+    }
+
+    @Override
+    public Page<ProductOrder> getAllOrdersPagination(Integer pageNo, Integer pageSize) {
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
+        return orderRepository.findAll(pageable);
     }
 }
