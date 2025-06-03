@@ -12,7 +12,8 @@
       <div class="col-md-10 offset-md-1">
         <div class="card card-sh">
           <div class="card-header text-center">
-            <p class="fs-4">Users</p>
+            <p class="fs-4" th:if="userType==1">Users</p>
+            <p class="fs-4" th:if="userType==2">Admins</p>
             <th:block th:if="${session.successMsg}">
               <p class="text-success fw-bold">[[${session.successMsg}]]</p>
               <th:block th:text="${@commomServiceImpl.removeSessionMessage()}"></th:block>
@@ -47,8 +48,8 @@
                 <td>[[${u.address+','+u.city+','+u.state+','+u.pincode}]]</td>
                 <td>[[${u.isEnabled}]]</td>
                 <td>
-                  <a th:href="@{'/admin/updateStatus?status=true&id='+${u.id}}" class="btn btn-primary btn-sm">Active</a>
-                  <a th:href="@{'/admin/updateStatus?status=false&id='+${u.id}}" class="btn btn-danger btn-sm">Inactive</a>
+                  <a th:href="@{'/admin/updateStatus?status=true&id='+${u.id}+'&type='+${userType}}" class="btn btn-primary btn-sm">Active</a>
+                  <a th:href="@{'/admin/updateStatus?status=false&id='+${u.id}+'&type='+${userType}}" class="btn btn-danger btn-sm">Inactive</a>
                 </td>
               </tr>
               </tbody>

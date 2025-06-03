@@ -1,6 +1,8 @@
 package com.distopy.util;
 
 import com.distopy.model.ProductOrder;
+import com.distopy.model.UserDtls;
+import com.distopy.service.UserService;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.servlet.http.HttpServletRequest;
@@ -10,12 +12,16 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
 
 import java.io.UnsupportedEncodingException;
+import java.security.Principal;
 
 @Component
 public class CommomUtils {
 
     @Autowired
     private JavaMailSender mailSender;
+
+    @Autowired
+    private UserService userService;
 
     public Boolean sendMail(String url, String recipientEmail) throws MessagingException, UnsupportedEncodingException {
 
@@ -70,6 +76,11 @@ public class CommomUtils {
         helper.setText(msg, true);
         mailSender.send(message);
         return true;
+    }
+
+    public UserDtls getLoggedInUserDetails(Principal p) {
+        String email = p.getName();
+        return userService.getUserByEmail(email);
     }
 
 }

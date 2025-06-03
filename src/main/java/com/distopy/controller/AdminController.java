@@ -15,6 +15,8 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.domain.Page;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.ObjectUtils;
@@ -51,6 +53,9 @@ public class AdminController {
 
     @Autowired
     private CommomUtils commomUtils;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @ModelAttribute
     public void getUserDetails(Principal p, Model m) {
@@ -285,14 +290,24 @@ public class AdminController {
     }
 
     @GetMapping("/users")
-    public String getAllUsers(Model m) {
-        List<UserDtls> users = userService.getUsers("ROLE_USER");
+    public String getAllUsers(Model m, @RequestParam Integer type) {
+        List<UserDtls> users;
+        if (type == 1) {
+            users = userService.getUsers("ROLE_USER");
+        } else {
+            users = userService.getUsers("ROLE_ADMIN");
+        }
+
+        m.addAttribute("userType", type);
         m.addAttribute("users", users);
         return "/admin/users";
     }
 
     @GetMapping("/updateStatus")
-    public String updateUserAccountStatus(@RequestParam Boolean status, @RequestParam Integer id, HttpSession session) {
+    public String updateUserAccountStatus(@RequestParam Boolean status,
+                                          @RequestParam Integer id,
+                                          @RequestParam Integer type,
+                                          HttpSession session) {
 
         Boolean f = userService.updateAccountStatus(id, status);
 
@@ -302,7 +317,7 @@ public class AdminController {
             session.setAttribute("errorMsg", "Something went wrong while updating the user account status!");
         }
 
-        return "redirect:/admin/users";
+        return "redirect:/admin/users?type="+type;
     }
 
     @GetMapping("/orders")
@@ -433,5 +448,44 @@ public class AdminController {
         }
 
         return "redirect:/admin/addAdmin";
+    }
+
+    @GetMapping("/profile")
+    public String profile(){
+        return "/admin/profile";
+    }
+
+    @PostMapping("/update_profile")
+    public String updateProfile(@ModelAttribute UserDtls user, @RequestParam("img") MultipartFile img, HttpSession session) throws IOException {
+        UserDtls updateUserProfile = userService.updateUserProfile(user, img);
+
+        if (ObjectUtils.isEmpty(updateUserProfile)) {
+            session.setAttribute("errorMsg", "Something went wrong while updating profile!");
+        } else {
+            session.setAttribute("successMsg", "Profile updated successfully!");
+        }
+        return "redirect:/admin/profile";
+    }
+
+    @PostMapping("/change_password")
+    public String changePassword(@RequestParam String newPassword, @RequestParam String currentPassword, HttpSession session, Principal p) {
+        UserDtls loggedInUserDetails = commomUtils.getLoggedInUserDetails(p);
+
+        boolean matches = passwordEncoder.matches(currentPassword, loggedInUserDetails.getPassword());
+
+        if (matches) {
+            String encode = passwordEncoder.encode(newPassword);
+            loggedInUserDetails.setPassword(encode);
+            UserDtls updatedUser = userService.updateUser(loggedInUserDetails);
+            if (ObjectUtils.isEmpty(updatedUser)) {
+                session.setAttribute("errorMsg", "Something went wrong while updating password!");
+            } else {
+                session.setAttribute("successMsg", "Password updated successfully!");
+            }
+        } else {
+            session.setAttribute("errorMsg", "Current password is incorrect!");
+        }
+
+        return "redirect:/admin/profile";
     }
 }
