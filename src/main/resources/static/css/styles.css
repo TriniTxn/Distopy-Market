@@ -4,6 +4,9 @@ body {
     font-family: 'Urbanist', sans-serif;
 }
 
+.error {
+    color: red;
+}
 .category-section {
     padding: 4rem 1rem;
     background-color: #ffffff;
