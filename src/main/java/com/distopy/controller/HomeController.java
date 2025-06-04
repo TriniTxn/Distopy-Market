@@ -32,6 +32,7 @@ import java.nio.file.StandardCopyOption;
 import java.security.Principal;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Controller
 public class HomeController {
@@ -75,7 +76,16 @@ public class HomeController {
     }
 
     @GetMapping("/")
-    public String index() {
+    public String index(Model m) {
+        List<Category> allActiveCategories = categoryService.getAllActiveCategory().stream()
+                .sorted((c1,c2) -> c2.getId().compareTo(c1.getId()))
+                .limit(6).toList();
+        List<Product> allActiveProducts = productService.getAllActiveProducts("").stream()
+                .sorted((p1,p2) -> p2.getId().compareTo(p1.getId()))
+                .limit(8).toList();
+
+        m.addAttribute("category", allActiveCategories);
+        m.addAttribute("product", allActiveProducts);
         return "index";
     }
 
