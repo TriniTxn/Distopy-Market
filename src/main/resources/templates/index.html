@@ -78,8 +78,8 @@
             <div class="col-6 col-sm-4 col-md-2 mb-4" th:each="c:${category}">
                 <div class="card category-card">
                     <div class="card-body">
-                        <img th:src="@{'img/category_img/'+${c.imageName}}" alt="Cellphones">
-                        <p>[[${c.name}]]</p>
+                        <img th:src="@{'img/category_img/'+${c.imageName}}" alt="Cellphones"><br>
+                        <a th:href="@{'/products?category='+${c.name}}" class="text-decoration-none">[[${c.name}]]</a>
                     </div>
                 </div>
             </div>
@@ -131,7 +131,9 @@
                 <div class="card product-card text-center">
                     <div class="card-body">
                         <img th:src="@{'img/product_img/'+${p.image}}" alt="Product Image">
-                        <p class="product-title">[[${p.title}]]</p>
+                        <p class="product-title">
+                            <a th:href="@{'/product/'+${p.id}}" class="text-decoration-none">[[${p.title}]]</a>
+                        </p>
                     </div>
                 </div>
             </div>
