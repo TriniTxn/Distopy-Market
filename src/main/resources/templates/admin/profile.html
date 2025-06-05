@@ -98,18 +98,18 @@
                         <div class="col-md-6 offset-md-3 mt-4">
                             <table class="table table-borderless">
                                 <tbody>
-                                <form action="/admin/change_password" method="POST" enctype="multipart/form-data">
+                                <form action="/admin/change_password" method="POST" enctype="multipart/form-data" id="adminProfileChangePasswordForm" novalidate>
                                     <tr>
                                         <th scope="row">Current Password</th>
                                         <td><input type="password" name="currentPassword" class="form-control"></td>
                                     </tr>
                                     <tr>
                                         <th scope="row">New Password</th>
-                                        <td><input type="password" name="newPassword" class="form-control"></td>
+                                        <td><input type="password" name="newPassword" class="form-control" id="newPassword" required></td>
                                     </tr>
                                     <tr>
                                         <th scope="row">Confirm Password</th>
-                                        <td><input type="password" name="confirmPassword" class="form-control"></td>
+                                        <td><input type="password" name="confirmNewPassword" class="form-control" required></td>
                                     </tr>
                                     <tr class="">
                                         <td></td>

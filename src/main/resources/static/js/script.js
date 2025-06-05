@@ -88,7 +88,7 @@ $(function () {
                 space:'Space Not Allowed!',
             },
         }
-    })
+    });
 
     // Reset Password Validation
 
@@ -115,6 +115,94 @@ $(function () {
                 required:'Confirm Password Required!',
                 space:'Space Not Allowed!',
                 equalTo:'Password Not Match!'
+            },
+        }
+    })
+
+    // Order Form Validation
+
+    var $orders=$("#orders");
+
+    $orders.validate({
+        rules:{
+            firstName:{
+                required:true,
+                lettersonly:true,
+            },
+            lastName:{
+                required:true,
+                lettersonly:true,
+            },
+            email:{
+                required:true,
+                space:true,
+                email:true,
+            },
+            mobileNumber:{
+                required:true,
+                space:true,
+                numericOnly:true,
+                minlength:10,
+                maxlength:12,
+            },
+            address:{
+                required:true,
+                all:true,
+            },
+            city:{
+                required:true,
+            },
+            state:{
+                required:true,
+            },
+            pincode:{
+                required:true,
+                numericOnly:true,
+                space:true,
+            },
+            paymentType:{
+                required:true,
+            }
+
+        },
+        messages:{
+            firstName:{
+                required:'Name Required!',
+                lettersonly:'Invalid Name!'
+            },
+            lastName:{
+                required:'Name Required!',
+                lettersonly:'Invalid Name!'
+            },
+            email:{
+                required:'Email Required!',
+                space:'Space Not Allowed!',
+                email:'Invalid Email!'
+            },
+            mobileNumber:{
+                required:'Mobile Number Required!',
+                space:'Space Not Allowed!',
+                numericOnly:'Invalid Mobile Number!',
+                minlength:'10 digits minimum!',
+                maxlength:'12 digits maximum'
+            },
+            address:{
+                required:'Address Required!',
+                all:'Invalid Address!',
+            },
+            city:{
+                required:'City Required!',
+            },
+            state:{
+                required:'State Required!',
+            },
+            pincode:{
+                required:'Pincode Required!',
+                numericOnly:'Invalid Pincode!',
+                space:'Space Not Allowed!',
+            },
+            paymentType:{
+                required:'Payment Type Required!',
             }
         }
     })

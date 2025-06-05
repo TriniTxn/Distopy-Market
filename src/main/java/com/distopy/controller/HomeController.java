@@ -63,7 +63,7 @@ public class HomeController {
             UserDtls userDtls = userService.getUserByEmail(email);
 
             /* Essa linha de código m.addAttribute serve para você poder utilizar esse parametro no HTML utilizando
-            * Ex: [[${user.getId}]] */
+             * Ex: [[${user.getId}]] */
             m.addAttribute("user", userDtls);
             Integer countCart = cartService.getCountCart(userDtls.getId());
             m.addAttribute("countCart", countCart);
@@ -78,10 +78,10 @@ public class HomeController {
     @GetMapping("/")
     public String index(Model m) {
         List<Category> allActiveCategories = categoryService.getAllActiveCategory().stream()
-                .sorted((c1,c2) -> c2.getId().compareTo(c1.getId()))
+                .sorted((c1, c2) -> c2.getId().compareTo(c1.getId()))
                 .limit(6).toList();
         List<Product> allActiveProducts = productService.getAllActiveProducts("").stream()
-                .sorted((p1,p2) -> p2.getId().compareTo(p1.getId()))
+                .sorted((p1, p2) -> p2.getId().compareTo(p1.getId()))
                 .limit(8).toList();
 
         m.addAttribute("category", allActiveCategories);
@@ -104,8 +104,7 @@ public class HomeController {
                            @RequestParam(value = "category", defaultValue = "") String category,
                            @RequestParam(name = "pageNo", defaultValue = "0") Integer pageNo,
                            @RequestParam(name = "pageSize", defaultValue = "2") Integer pageSize,
-                           @RequestParam(defaultValue = "") String ch)
-    {
+                           @RequestParam(defaultValue = "") String ch) {
         List<Category> categories = categoryService.getAllActiveCategory();
         m.addAttribute("paramValue", category.isEmpty() ? "All" : category);
         m.addAttribute("categories", categories);
@@ -114,7 +113,7 @@ public class HomeController {
 
         Page<Product> page;
 
-        if (StringUtils.isEmpty(ch)){
+        if (StringUtils.isEmpty(ch)) {
             page = productService.getAllActiveProductPagination(pageNo, pageSize, category);
         } else {
             page = productService.searchActiveProductPagination(pageNo, pageSize, category, ch);
@@ -147,34 +146,42 @@ public class HomeController {
                            HttpSession session) {
 
         try {
-            // Define nome da imagem
-            String imageName = image.isEmpty() ? "default.jpg" : image.getOriginalFilename();
-            user.setProfileImage(imageName);
 
-            // Salva usuário no banco
-            UserDtls savedUser = userService.saveUser(user);
+            Boolean existsEmail = userService.existsEmail(user.getEmail());
 
-            if (!ObjectUtils.isEmpty(savedUser)) {
-                // Se tiver imagem, salva no sistema de arquivos
-                if (!image.isEmpty()) {
-                    File staticImgFolder = new ClassPathResource("static/img").getFile();
+            if (existsEmail) {
+                session.setAttribute("errorMsg", "Email already exists!");
+                return "redirect:/register";
+            } else {
+                // Define nome da imagem
+                String imageName = image.isEmpty() ? "default.jpg" : image.getOriginalFilename();
+                user.setProfileImage(imageName);
 
-                    // Garante que a pasta profile_img exista
-                    File profileImgDir = new File(staticImgFolder, "profile_img");
-                    if (!profileImgDir.exists()) {
-                        profileImgDir.mkdirs(); // cria diretórios se não existirem
+                // Salva usuário no banco
+                UserDtls savedUser = userService.saveUser(user);
+
+                if (!ObjectUtils.isEmpty(savedUser)) {
+                    // Se tiver imagem, salva no sistema de arquivos
+                    if (!image.isEmpty()) {
+                        File staticImgFolder = new ClassPathResource("static/img").getFile();
+
+                        // Garante que a pasta profile_img exista
+                        File profileImgDir = new File(staticImgFolder, "profile_img");
+                        if (!profileImgDir.exists()) {
+                            profileImgDir.mkdirs(); // cria diretórios se não existirem
+                        }
+
+                        // Define caminho completo da imagem
+                        Path imagePath = Paths.get(profileImgDir.getAbsolutePath(), image.getOriginalFilename());
+
+                        // Copia a imagem para o destino
+                        Files.copy(image.getInputStream(), imagePath, StandardCopyOption.REPLACE_EXISTING);
                     }
 
-                    // Define caminho completo da imagem
-                    Path imagePath = Paths.get(profileImgDir.getAbsolutePath(), image.getOriginalFilename());
-
-                    // Copia a imagem para o destino
-                    Files.copy(image.getInputStream(), imagePath, StandardCopyOption.REPLACE_EXISTING);
+                    session.setAttribute("successMsg", "User saved successfully!");
+                } else {
+                    session.setAttribute("errorMsg", "Something went wrong while saving the user!");
                 }
-
-                session.setAttribute("successMsg", "User saved successfully!");
-            } else {
-                session.setAttribute("errorMsg", "Something went wrong while saving the user!");
             }
 
         } catch (IOException e) {
@@ -205,9 +212,9 @@ public class HomeController {
             userService.updateUserResetToken(email, resetToken);
 
             /* Generating the URL to redirect the user to reset password
-            * Example: https://localhost:8080/reset_password?token=dajdnafFSAKNFNFfajfnF9291*/
+             * Example: https://localhost:8080/reset_password?token=dajdnafFSAKNFNFfajfnF9291*/
 
-            String url = CommomUtils.generateUrl(request)+"/reset_password?token="+resetToken;
+            String url = CommomUtils.generateUrl(request) + "/reset_password?token=" + resetToken;
             System.out.println(url);
 
             Boolean sendMail = commomUtils.sendMail(url, email);
@@ -236,7 +243,7 @@ public class HomeController {
     }
 
     @PostMapping("/reset_password")
-    public String resetPassword(@RequestParam String token, Model m,@RequestParam String password, HttpSession session) {
+    public String resetPassword(@RequestParam String token, Model m, @RequestParam String password, HttpSession session) {
 
         UserDtls userByToken = userService.getUserByResetToken(token);
 

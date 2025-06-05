@@ -8,7 +8,7 @@
 <body>
 <section>
   <div class="container mt-5 p-5">
-    <form action="/user/saveOrder" method="POST">
+    <form action="/user/saveOrder" method="POST" id="orders" novalidate>
       <div class="row">
         <div class="col-md-6 mt-2">
             <div class="mb-3 row">
@@ -91,7 +91,7 @@
                 <div class="mb-3">
                   <label class="form-label">Select Payment Type</label>
                   <select name="paymentType" required>
-                    <option>---Select---</option>
+                    <option value="">---Select---</option>
                     <option value="COD">Cash on Delivery</option>
                     <option value="ONLINE">Online Payment</option>
                   </select>
