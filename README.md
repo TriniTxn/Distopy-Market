@@ -5,7 +5,39 @@
 - Maven
 - Oracle Database
 - Email account to SMTP
-### Entity Relationships
+### Data Model
+
+#### Entities
+
+1. **UserDtls**
+   - Fields: id, name, mobileNumber, email, address, city, state, pincode, password, profileImage, role, isEnabled, accountNonLocked, failedLoginCount, lockTime, resetToken
+   - Purpose: Stores user information, authentication details, and account security status
+
+2. **Category**
+   - Fields: id, name, imageName, isActive
+   - Purpose: Represents product categories
+
+3. **Product**
+   - Fields: id, title, description, category, price, stock, image, discount, discountPrice, isActive
+   - Purpose: Stores product information including pricing and inventory
+
+4. **Cart**
+   - Fields: id, user, product, quantity, totalPrice (transient), totalOrderPrice (transient)
+   - Purpose: Represents items in a user's shopping cart
+
+5. **OrderAddress**
+   - Fields: id, firstName, lastName, email, mobileNumber, address, city, state, pincode
+   - Purpose: Stores shipping address information for orders
+
+6. **ProductOrder**
+   - Fields: id, orderId, orderDate, product, price, quantity, user, status, paymentType, orderAddress
+   - Purpose: Represents a customer order with product, pricing, and shipping details
+
+7. **OrderRequest** (DTO)
+   - Fields: firstName, lastName, email, mobileNumber, address, city, state, pincode, paymentType
+   - Purpose: Data transfer object for order creation requests
+
+#### Entity Relationships
 
 1. **UserDtls - Cart**: One-to-Many
    - A user can have multiple cart items
@@ -18,6 +50,18 @@
 3. **Category - Product**: Indirect Relationship
    - Products have a category field (stored as String)
    - Categories are managed separately
+
+4. **UserDtls - ProductOrder**: One-to-Many
+   - A user can have multiple orders
+   - Each order belongs to one user
+
+5. **Product - ProductOrder**: One-to-Many
+   - A product can be in multiple orders
+   - Each order item references one product
+
+6. **OrderAddress - ProductOrder**: One-to-One
+   - Each order has one shipping address
+   - Each shipping address belongs to one order
 
 ### Key Features
 
